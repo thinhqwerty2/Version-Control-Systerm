@@ -3,8 +3,6 @@ package svcs.command
 import svcs.*
 import java.io.File
 import java.io.FileInputStream
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.security.MessageDigest
 
 abstract class CommandExecute(val args: Array<String>) {
@@ -16,11 +14,11 @@ abstract class CommandExecute(val args: Array<String>) {
             .joinToString("")
     }
 
-    fun getHash(filePath: String, algorithm: String = "SHA-256"): ByteArray {
+    private fun getHash(filePath: String, algorithm: String = "SHA-256"): ByteArray {
         val md: MessageDigest = MessageDigest.getInstance(algorithm)
         val fis = FileInputStream(filePath)
         val dataBytes = ByteArray(1024)
-        var nread = 0
+        var nread: Int
         while (fis.read(dataBytes).also { nread = it } != -1) {
             md.update(dataBytes, 0, nread)
         }
@@ -190,8 +188,8 @@ class CheckoutCommand(args: Array<String>) : CommandExecute(args) {
 
                 val filesChange = index.readLines()
                 for (i in 0..filesChange.lastIndex) {
-                    val curFile=File("$commitDirPath\\${filesChange[i]}")
-                    curFile.copyTo(File(CURRENT_DIR), true)
+                    File("$commitDirPath\\${filesChange[i]}")
+                        .copyTo(File("$CURRENT_DIR\\${filesChange[i]}"), true)
                 }
                 println("Switched to commit $commitId.")
             } else {
